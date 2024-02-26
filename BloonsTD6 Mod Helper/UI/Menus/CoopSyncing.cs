@@ -19,11 +19,6 @@ internal class CoopSyncing : BloonsTD6Mod
     private static NKMultiGameInterface? _nkGi;
     private static ModHelperPanel restartPanel;
 
-    public override void OnUpdate()
-    {
-        MelonLogger.Msg("cool");
-    }
-
     public class PlayerModData
     {
         public int PlayerNumber { get; set; }

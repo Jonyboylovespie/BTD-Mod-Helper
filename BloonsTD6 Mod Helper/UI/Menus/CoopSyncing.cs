@@ -84,7 +84,6 @@ internal class CoopSyncing : BloonsTD6Mod
         {
             hostMods.Add(mod.Info.Name);
         }
-        MelonLogger.Msg(JsonConvert.SerializeObject(new PlayerModData(_nkGi.PeerID, hostMods), Formatting.Indented));
         _nkGi.SendToPeer(2, MessageUtils.CreateMessageEx(" ", "FindMods"));
         _nkGi.SendToPeer(3, MessageUtils.CreateMessageEx(" ", "FindMods"));
         _nkGi.SendToPeer(4, MessageUtils.CreateMessageEx(" ", "FindMods"));
@@ -140,6 +139,7 @@ internal class CoopSyncing : BloonsTD6Mod
     
     public override bool ActOnMessage(Message message)
     {
+        MelonLogger.Msg("recieved: " + message.Code);
         switch (message.Code)
         {
             case "ReturnMods":

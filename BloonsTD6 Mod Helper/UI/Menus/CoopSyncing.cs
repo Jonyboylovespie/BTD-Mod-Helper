@@ -25,9 +25,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using BTD_Mod_Helper.Api.Internal;
 
-[assembly: MelonInfo(typeof(CoopSync.MelonMain), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
-[assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
-
 namespace CoopSync;
 
 internal partial class MelonMain : BloonsTD6Mod

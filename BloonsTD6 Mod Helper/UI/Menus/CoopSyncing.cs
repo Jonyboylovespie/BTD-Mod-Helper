@@ -50,41 +50,10 @@ internal partial class CoopSync : BloonsTD6Mod
         {
             if (waitingForMenuOpen)
             {
-                try
-                {
-                    GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button")
-                        .GetComponent<Button>().onClick.Invoke();
-                }
-                catch
-                {
-                }
-
-                try
-                {
-                    GameObject.Find("PlaySocialCanvas/PlaySocialScreen/Coop/Buttons/JoinMatch").GetComponent<Button>()
-                        .onClick.Invoke();
-                }
-                catch
-                {
-                }
-
-                try
-                {
-                    GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/CodeInput")
-                        .GetComponent<TMP_InputField>().text = gameCode;
-                }
-                catch
-                {
-                }
-
-                try
-                {
-                    GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/GoButton")
-                        .GetComponent<Button>().onClick.Invoke();
-                }
-                catch
-                {
-                }
+                if (GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button").Exists()) GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button").GetComponent<Button>().onClick.Invoke();
+                if (GameObject.Find("PlaySocialCanvas/PlaySocialScreen/Coop/Buttons/JoinMatch").Exists()) GameObject.Find("PlaySocialCanvas/PlaySocialScreen/Coop/Buttons/JoinMatch").GetComponent<Button>().onClick.Invoke();
+                if (GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/CodeInput").Exists()) GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/CodeInput").GetComponent<TMP_InputField>().text = gameCode;
+                if (GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/GoButton").Exists()) GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/GoButton").GetComponent<Button>().onClick.Invoke();
             }
         }
 
@@ -159,7 +128,6 @@ internal partial class CoopSync : BloonsTD6Mod
             {
                 hostMods.Add(mod.Info.Name);
             }
-
             _nkGi.SendToPeer(2, MessageUtils.CreateMessageEx(" ", "FindMods"));
             _nkGi.SendToPeer(3, MessageUtils.CreateMessageEx(" ", "FindMods"));
             _nkGi.SendToPeer(4, MessageUtils.CreateMessageEx(" ", "FindMods"));
@@ -168,13 +136,17 @@ internal partial class CoopSync : BloonsTD6Mod
         private static List<string> ConvertJTokenToList(JToken token)
         {
             var resultList = new List<string>();
-
             if (token.Type == JTokenType.Array)
+            {
                 foreach (var child in token.Children())
+                {
                     resultList.Add(child.ToString());
+                }
+            }
             else
+            {
                 resultList.Add(token.ToString());
-
+            }
             return resultList;
         }
 
@@ -199,8 +171,7 @@ internal partial class CoopSync : BloonsTD6Mod
             var modsToRemove = playerMods.Except(hostMods).ToList();
             if (modsToRemove.Count != 0 || modsToAdd.Count != 0)
             {
-                playerSyncButton = GameObject.Find("Canvas/CoopLobbyScreen/CoopPlayerInfo").transform
-                    .GetChild(playerNumber - 1).gameObject.AddModHelperPanel(new Info("SyncMods", -206.85f, -50f, 100)
+                playerSyncButton = GameObject.Find("Canvas/CoopLobbyScreen/CoopPlayerInfo").transform.GetChild(playerNumber - 1).gameObject.AddModHelperPanel(new Info("SyncMods", -206.85f, -50f, 100)
                     {
                         Pivot = Vector2.one,
                         Anchor = Vector2.one
@@ -241,7 +212,6 @@ internal partial class CoopSync : BloonsTD6Mod
                         mod.MoveToDisabledModsFolder();
                     }
                 }
-
                 foreach (var modToAdd in modsToAdd)
                 {
                     if (mod.Name == modToAdd)
@@ -251,7 +221,6 @@ internal partial class CoopSync : BloonsTD6Mod
                     }
                 }
             }
-
             RestartGame(_nkGi.MatchID);
         }
 
@@ -279,7 +248,6 @@ internal partial class CoopSync : BloonsTD6Mod
 
                 sb.Append(". ");
             }
-
             if (modsToRemove.Count > 0)
             {
                 sb.Append("If you sync, the mod(s) that will be removed are: ");
@@ -295,9 +263,7 @@ internal partial class CoopSync : BloonsTD6Mod
 
                 sb.Append(". ");
             }
-
-            sb.Append(
-                "By clicking ok, it will download added mods off mod browser, disable removed mods, and restart your game.");
+            sb.Append("By clicking ok, it will download added mods off mod browser, disable removed mods, and restart your game.");
             PopupScreen.instance.SafelyQueue(screen => screen.ShowPopup(PopupScreen.Placement.menuCenter,
                 "Sync Mods",
                 sb.ToString(),
@@ -320,7 +286,6 @@ internal partial class CoopSync : BloonsTD6Mod
                     playerMods = player4Mods;
                     break;
             }
-
             var modsToAdd = hostMods.Except(playerMods).ToList();
             var modsToRemove = playerMods.Except(hostMods).ToList();
             Dictionary<string, object> modsData = new Dictionary<string, object>
@@ -328,22 +293,19 @@ internal partial class CoopSync : BloonsTD6Mod
                 { "modsToAdd", modsToAdd },
                 { "modsToRemove", modsToRemove }
             };
-            _nkGi.SendToPeer(playerNumber,
-                MessageUtils.CreateMessageEx(JsonConvert.SerializeObject(modsData, Formatting.Indented), "ChangeMods"));
+            _nkGi.SendToPeer(playerNumber, MessageUtils.CreateMessageEx(JsonConvert.SerializeObject(modsData, Formatting.Indented), "ChangeMods"));
         }
 
         public void PlayerDeclined(int playerNumber)
         {
             Action cancelAction = () =>
             {
-                GameObject.Find("Canvas/CoopLobbyScreen/CoopPlayerInfo/PlayerSlot" + playerNumber + "/SyncMods")
-                    .Destroy();
+                GameObject.Find("Canvas/CoopLobbyScreen/CoopPlayerInfo/PlayerSlot" + playerNumber + "/SyncMods").Destroy();
             };
             Action okAction = () =>
             {
                 _nkGi.SendToPeer(playerNumber, MessageUtils.CreateMessageEx(" ", "KickPlayer"));
-                GameObject.Find("Canvas/CoopLobbyScreen/CoopPlayerInfo/PlayerSlot" + playerNumber + "/SyncMods")
-                    .Destroy();
+                GameObject.Find("Canvas/CoopLobbyScreen/CoopPlayerInfo/PlayerSlot" + playerNumber + "/SyncMods").Destroy();
             };
             PopupScreen.instance.SafelyQueue(screen => screen.ShowPopup(PopupScreen.Placement.menuCenter,
                 "Player" + playerNumber + " Declined Mod Sync",
@@ -365,9 +327,7 @@ internal partial class CoopSync : BloonsTD6Mod
                     PlayerDeclined(playerNumber);
                     return true;
                 case "ChangeMods":
-                    var modsData =
-                        JsonConvert.DeserializeObject<Dictionary<string, List<object>>>(
-                            MessageUtils.ReadMessage<string>(message));
+                    var modsData = JsonConvert.DeserializeObject<Dictionary<string, List<object>>>(MessageUtils.ReadMessage<string>(message));
                     var modsToAdd = modsData["modsToAdd"].Cast<string>().ToList();
                     var modsToRemove = modsData["modsToRemove"].Cast<string>().ToList();
                     RequestModChange(modsToAdd, modsToRemove);
@@ -384,11 +344,7 @@ internal partial class CoopSync : BloonsTD6Mod
                     {
                         playersMods.Add(mod.Info.Name);
                     }
-
-                    _nkGi.SendToPeer(1,
-                        MessageUtils.CreateMessageEx(
-                            JsonConvert.SerializeObject(new PlayerModData(_nkGi.PeerID, playersMods),
-                                Formatting.Indented), "ReturnMods"));
+                    _nkGi.SendToPeer(1, MessageUtils.CreateMessageEx(JsonConvert.SerializeObject(new PlayerModData(_nkGi.PeerID, playersMods), Formatting.Indented), "ReturnMods"));
                     return true;
                 default:
                     return false;

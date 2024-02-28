@@ -27,7 +27,6 @@ using BTD_Mod_Helper.Api.Coop;
 using BTD_Mod_Helper.Api.Enums;
 using BTD_Mod_Helper.Api.Helpers;
 using BTD_Mod_Helper.Extensions;
-using CoopSync;
 using HarmonyLib;
 using Il2Cpp;
 using Il2CppAssets.Scripts.Unity.UI_New.Coop;

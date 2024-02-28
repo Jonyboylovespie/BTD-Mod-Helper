@@ -200,7 +200,7 @@ internal partial class CoopSync : BloonsTD6Mod
             ProcessHelper.RestartGame();
         }
 
-        public void AddAndRemoveMods(List<string> modsToAdd, List<string> modsToRemove)
+        public async void AddAndRemoveMods(List<string> modsToAdd, List<string> modsToRemove)
         {
             foreach (var mod in ModHelperGithub.Mods)
             {
@@ -217,7 +217,7 @@ internal partial class CoopSync : BloonsTD6Mod
                     if (mod.Name == modToAdd)
                     {
                         modsToAdd.Remove(modToAdd);
-                        ModHelperGithub.DownloadLatest(mod, true);
+                        await ModHelperGithub.DownloadLatest(mod, true);
                     }
                 }
             }

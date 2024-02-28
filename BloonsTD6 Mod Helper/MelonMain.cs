@@ -343,15 +343,13 @@ internal partial class MelonMain : BloonsTD6Mod
 
         public async void AddAndRemoveMods(List<string> modsToAdd, List<string> modsToRemove)
         {
-            foreach (var mod in RegisteredMelons)
+            foreach (var mod in RegisteredMelons.ToList())
             {
                 foreach (var modToRemove in modsToRemove)
                 {
-                    MelonLogger.Msg(modToRemove);
                     if (mod.Info.Name == modToRemove)
                     {
-                        MelonLogger.Msg(mod.MelonAssembly);
-                        File.Move(MelonEnvironment.ModsDirectory + "/" + mod.MelonAssembly, ModHelper.DisabledModsDirectory);
+                        File.Move(mod.MelonAssembly.Assembly.Location, ModHelper.DisabledModsDirectory);
                     }
                 }
             }

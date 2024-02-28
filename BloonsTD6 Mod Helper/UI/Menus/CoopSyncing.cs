@@ -328,13 +328,13 @@ internal partial class CoopSync : BloonsTD6Mod
                     return true;
                 case "ChangeMods":
                     var modsData = JsonConvert.DeserializeObject<Dictionary<string, List<object>>>(MessageUtils.ReadMessage<string>(message));
-                    var modsToAdd = modsData["modsToAdd"].Cast<string>().ToList();
+                    var modsToAdd = modsData!["modsToAdd"].Cast<string>().ToList();
                     var modsToRemove = modsData["modsToRemove"].Cast<string>().ToList();
                     RequestModChange(modsToAdd, modsToRemove);
                     return true;
                 case "ReturnMods":
                     var playerModDataJson = JObject.Parse(MessageUtils.ReadMessage<string>(message));
-                    playerNumber = int.Parse(playerModDataJson.GetValue("PlayerNumber").ToString());
+                    playerNumber = int.Parse(playerModDataJson.GetValue("PlayerNumber")!.ToString());
                     UpdateModDifferences(playerNumber, playerModDataJson);
                     return true;
                 case "FindMods":

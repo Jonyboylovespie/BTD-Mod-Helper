@@ -131,7 +131,7 @@ internal partial class CoopSync : BloonsTD6Mod
             _nkGi.SendToPeer(2, MessageUtils.CreateMessageEx(" ", "FindMods"));
             _nkGi.SendToPeer(3, MessageUtils.CreateMessageEx(" ", "FindMods"));
             _nkGi.SendToPeer(4, MessageUtils.CreateMessageEx(" ", "FindMods"));
-            MelonLogger.Msg("sent")
+            MelonLogger.Msg("sent");
         }
 
         private static List<string> ConvertJTokenToList(JToken token)
@@ -339,7 +339,7 @@ internal partial class CoopSync : BloonsTD6Mod
                     UpdateModDifferences(playerNumber, playerModDataJson);
                     return true;
                 case "FindMods":
-                    MelonLogger.Msg("received")
+                    MelonLogger.Msg("received");
                     List<MelonMod> loadedMods = RegisteredMelons.ToList();
                     var playersMods = new List<string>();
                     foreach (var mod in loadedMods)

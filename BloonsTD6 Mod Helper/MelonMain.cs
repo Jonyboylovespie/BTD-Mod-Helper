@@ -356,7 +356,6 @@ internal partial class MelonMain : BloonsTD6Mod
                 {
                     if (mod.Name == modToRemove)
                     {
-                        modsToRemove.Remove(modToRemove);
                         mod.MoveToDisabledModsFolder();
                     }
                 }
@@ -364,7 +363,6 @@ internal partial class MelonMain : BloonsTD6Mod
                 {
                     if (mod.Name == modToAdd)
                     {
-                        modsToAdd.Remove(modToAdd);
                         await ModHelperGithub.DownloadLatest(mod, true);
                     }
                 }

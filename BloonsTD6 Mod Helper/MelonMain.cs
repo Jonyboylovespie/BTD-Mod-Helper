@@ -347,6 +347,7 @@ internal partial class MelonMain : BloonsTD6Mod
             {
                 foreach (var modToRemove in modsToRemove)
                 {
+                    MelonLogger.Msg(modToRemove);
                     if (mod.Name == modToRemove)
                     {
                         MelonLogger.Msg(mod.DllName);

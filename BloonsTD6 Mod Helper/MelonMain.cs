@@ -108,6 +108,15 @@ internal partial class MelonMain : BloonsTD6Mod
 
     public override void OnUpdate()
     {
+
+        if (waitingForMenuOpen)
+            {
+                if (GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button").Exists()) GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button").GetComponent<Button>().onClick.Invoke();
+                if (GameObject.Find("PlaySocialCanvas/PlaySocialScreen/Coop/Buttons/JoinMatch").Exists()) GameObject.Find("PlaySocialCanvas/PlaySocialScreen/Coop/Buttons/JoinMatch").GetComponent<Button>().onClick.Invoke();
+                if (GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/CodeInput").Exists()) GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/CodeInput").GetComponent<TMP_InputField>().text = gameCode;
+                if (GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/GoButton").Exists()) GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/GoButton").GetComponent<Button>().onClick.Invoke();
+            }
+        
         ModByteLoader.OnUpdate();
         RoundSetChanger.OnUpdate();
         // InitialLoadTasks_MoveNext.Update();
@@ -132,6 +141,14 @@ internal partial class MelonMain : BloonsTD6Mod
     public override void OnTitleScreen()
     {
         Schedule_InGame_Loaded();
+
+        if (File.Exists(MelonEnvironment.ModsDirectory + "/BloonsTD6 Mod Helper/matchCode.json"))
+            {
+                GameObject.Find("Canvas/ScreenBoxer/TitleScreen/Start").GetComponent<Button>().onClick.Invoke();
+                gameCode = File.ReadAllText(MelonEnvironment.ModsDirectory + "/BloonsTD6 Mod Helper/matchCode.json");
+                File.Delete(MelonEnvironment.ModsDirectory + "/BloonsTD6 Mod Helper/matchCode.json");
+                waitingForMenuOpen = true;
+            }
     }
 
     private void Schedule_GameModel_Loaded()
@@ -186,28 +203,6 @@ internal partial class MelonMain : BloonsTD6Mod
         private static ModHelperPanel playerSyncButton;
         private static bool waitingForMenuOpen;
         private static string gameCode;
-
-        public override void OnTitleScreen()
-        {
-            if (File.Exists(MelonEnvironment.ModsDirectory + "/BloonsTD6 Mod Helper/matchCode.json"))
-            {
-                GameObject.Find("Canvas/ScreenBoxer/TitleScreen/Start").GetComponent<Button>().onClick.Invoke();
-                gameCode = File.ReadAllText(MelonEnvironment.ModsDirectory + "/BloonsTD6 Mod Helper/matchCode.json");
-                File.Delete(MelonEnvironment.ModsDirectory + "/BloonsTD6 Mod Helper/matchCode.json");
-                waitingForMenuOpen = true;
-            }
-        }
-
-        public override void OnUpdate()
-        {
-            if (waitingForMenuOpen)
-            {
-                if (GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button").Exists()) GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button").GetComponent<Button>().onClick.Invoke();
-                if (GameObject.Find("PlaySocialCanvas/PlaySocialScreen/Coop/Buttons/JoinMatch").Exists()) GameObject.Find("PlaySocialCanvas/PlaySocialScreen/Coop/Buttons/JoinMatch").GetComponent<Button>().onClick.Invoke();
-                if (GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/CodeInput").Exists()) GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/CodeInput").GetComponent<TMP_InputField>().text = gameCode;
-                if (GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/GoButton").Exists()) GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/GoButton").GetComponent<Button>().onClick.Invoke();
-            }
-        }
 
         public class PlayerModData
         {

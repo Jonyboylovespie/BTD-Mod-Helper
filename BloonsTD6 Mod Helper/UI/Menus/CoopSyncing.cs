@@ -27,7 +27,7 @@ using BTD_Mod_Helper.Api.Internal;
 
 namespace CoopSync;
 
-internal partial class MelonMain : BloonsTD6Mod
+internal partial class CoopSync : BloonsTD6Mod
 {
         private static NKMultiGameInterface _nkGi;
         private static ModHelperPanel syncPanel;
@@ -231,25 +231,17 @@ internal partial class MelonMain : BloonsTD6Mod
 
         public void AddAndRemoveMods(List<string> modsToAdd, List<string> modsToRemove)
         {
-            foreach (var mod in modsToRemove)
-            {
-                foreach (var melonMod in RegisteredMelons.ToList())
-                {
-                    if (mod == melonMod.Info.Name)
-                    {
-                        var modPath = melonMod.MelonAssembly.Assembly.Location;
-                        var modName = Path.GetFileName(modPath);
-                        var folderPath = MelonEnvironment.ModsDirectory + "/Disabled";
-                        if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
-                        var newFilePath = Path.Combine(folderPath, modName);
-                        if (File.Exists(newFilePath)) File.Delete(newFilePath);
-                        File.Move(modPath, newFilePath);
-                    }
-                }
-            }
-
             foreach (var mod in ModHelperGithub.Mods)
             {
+                foreach (var modToRemove in modsToRemove)
+                {
+                    if (mod.Name == modToRemove)
+                    {
+                        modsToRemove.Remove(modToRemove);
+                        mod.MoveToDisabledModsFolder();
+                    }
+                }
+
                 foreach (var modToAdd in modsToAdd)
                 {
                     if (mod.Name == modToAdd)

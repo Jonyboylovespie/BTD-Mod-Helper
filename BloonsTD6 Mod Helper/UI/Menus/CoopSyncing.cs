@@ -70,6 +70,11 @@ internal partial class CoopSync : BloonsTD6Mod
             }
         }
 
+        void MyMethod(int value)
+        {
+            Console.WriteLine("Received value: " + value);
+        }
+
         [HarmonyPatch(typeof(CoopLobbyScreen), nameof(CoopLobbyScreen.Open))]
         private static class CoopLobbyScreen_Open
         {
@@ -77,6 +82,11 @@ internal partial class CoopSync : BloonsTD6Mod
             private static void Postfix(CoopLobbyScreen __instance)
             {
                 _nkGi = __instance.coopLobbyData.lobbyConnection.Connection.NKGI;
+                
+                CoopSync example = new CoopSync();
+                Action<int> action = example.MyMethod;
+                _nkGi.add_PeerConnectedEvent(action);
+                
                 waitingForMenuOpen = false;
 
                 if (_nkGi.IsCoOpHost())
@@ -128,7 +138,6 @@ internal partial class CoopSync : BloonsTD6Mod
             {
                 hostMods.Add(mod.Info.Name);
             }
-            _nkGi = null;
             _nkGi.SendToPeer(2, MessageUtils.CreateMessageEx(" ", "FindMods"));
             _nkGi.SendToPeer(3, MessageUtils.CreateMessageEx(" ", "FindMods"));
             _nkGi.SendToPeer(4, MessageUtils.CreateMessageEx(" ", "FindMods"));

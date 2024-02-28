@@ -349,7 +349,7 @@ internal partial class MelonMain : BloonsTD6Mod
                 {
                     if (mod.Info.Name == modToRemove)
                     {
-                        File.Move(mod.MelonAssembly.Assembly.Location, ModHelper.DisabledModsDirectory + mod.MelonAssembly.Assembly.Location.Substring(MelonEnvironment.ModsDirectory.Length + 1));
+                        File.Move(mod.MelonAssembly.Assembly.Location, ModHelper.DisabledModsDirectory + "/" + mod.MelonAssembly.Assembly.Location.Substring(MelonEnvironment.ModsDirectory.Length + 1));
                     }
                 }
             }

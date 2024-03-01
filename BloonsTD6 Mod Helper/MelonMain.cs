@@ -97,12 +97,6 @@ internal partial class MelonMain : BloonsTD6Mod
 
     public override void OnUpdate()
     {
-        
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            CoopSync.CreateModPopup(new List<string>(0), new List<string>(1) {"coolMod"});
-        }
-            
         if (waitingForMenuOpen)
         {
             if (GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button").Exists()) GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button").GetComponent<Button>().onClick.Invoke();
@@ -200,10 +194,7 @@ internal partial class MelonMain : BloonsTD6Mod
     private static string gameCode;
     private static int modsChanged;
 
-    internal partial class CoopSync : BloonsTD6Mod
-    {
-        
-        public class PlayerModData
+    public class PlayerModData
         {
             public int PlayerNumber { get; set; }
 
@@ -526,5 +517,4 @@ internal partial class MelonMain : BloonsTD6Mod
                     return false;
             }
         }
-    }
 }

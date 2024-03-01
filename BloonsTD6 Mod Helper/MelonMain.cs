@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using BTD_Mod_Helper;
@@ -14,26 +14,22 @@ using Il2CppAssets.Scripts.Unity;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu;
 using Newtonsoft.Json.Linq;
-using TaskScheduler = BTD_Mod_Helper.Api.TaskScheduler;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using BTD_Mod_Helper.Api.Components;
 using BTD_Mod_Helper.Api.Coop;
 using BTD_Mod_Helper.Api.Enums;
-using BTD_Mod_Helper.Extensions;
-using HarmonyLib;
-using Il2Cpp;
 using Il2CppAssets.Scripts.Unity.UI_New.Coop;
 using Il2CppAssets.Scripts.Unity.UI_New.Popups;
 using Il2CppNinjaKiwi.NKMulti;
 using Il2CppTMPro;
-using MelonLoader;
 using MelonLoader.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
-
+using TaskScheduler = BTD_Mod_Helper.Api.TaskScheduler;
 [assembly: MelonInfo(typeof(MelonMain), ModHelper.Name, ModHelper.Version, ModHelper.Author)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6-Epic")]
@@ -101,14 +97,19 @@ internal partial class MelonMain : BloonsTD6Mod
 
     public override void OnUpdate()
     {
-
+        
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            CoopSync.CreateModPopup(new List<string>(0), new List<string>(1) {"coolMod"});
+        }
+            
         if (waitingForMenuOpen)
-            {
-                if (GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button").Exists()) GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button").GetComponent<Button>().onClick.Invoke();
-                if (GameObject.Find("PlaySocialCanvas/PlaySocialScreen/Coop/Buttons/JoinMatch").Exists()) GameObject.Find("PlaySocialCanvas/PlaySocialScreen/Coop/Buttons/JoinMatch").GetComponent<Button>().onClick.Invoke();
-                if (GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/CodeInput").Exists()) GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/CodeInput").GetComponent<TMP_InputField>().text = gameCode;
-                if (GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/GoButton").Exists()) GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/GoButton").GetComponent<Button>().onClick.Invoke();
-            }
+        {
+            if (GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button").Exists()) GameObject.Find("MainMenuCanvas/MainMenu/BottomButtonGroup/CoOp/CoopAnim/Button").GetComponent<Button>().onClick.Invoke();
+            if (GameObject.Find("PlaySocialCanvas/PlaySocialScreen/Coop/Buttons/JoinMatch").Exists()) GameObject.Find("PlaySocialCanvas/PlaySocialScreen/Coop/Buttons/JoinMatch").GetComponent<Button>().onClick.Invoke();
+            if (GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/CodeInput").Exists()) GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/CodeInput").GetComponent<TMP_InputField>().text = gameCode;
+            if (GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/GoButton").Exists()) GameObject.Find("CoopJoinMatchCanvas/CoopJoinScreen/ButtonGroup/BgPanel/Code/GoButton").GetComponent<Button>().onClick.Invoke();
+        }
         
         ModByteLoader.OnUpdate();
         RoundSetChanger.OnUpdate();
@@ -134,14 +135,14 @@ internal partial class MelonMain : BloonsTD6Mod
     public override void OnTitleScreen()
     {
         Schedule_InGame_Loaded();
-
+        
         if (File.Exists(MelonEnvironment.ModsDirectory + "/BloonsTD6 Mod Helper/matchCode.json"))
-            {
-                GameObject.Find("Canvas/ScreenBoxer/TitleScreen/Start").GetComponent<Button>().onClick.Invoke();
-                gameCode = File.ReadAllText(MelonEnvironment.ModsDirectory + "/BloonsTD6 Mod Helper/matchCode.json");
-                File.Delete(MelonEnvironment.ModsDirectory + "/BloonsTD6 Mod Helper/matchCode.json");
-                waitingForMenuOpen = true;
-            }
+        {
+            GameObject.Find("Canvas/ScreenBoxer/TitleScreen/Start").GetComponent<Button>().onClick.Invoke();
+            gameCode = File.ReadAllText(MelonEnvironment.ModsDirectory + "/BloonsTD6 Mod Helper/matchCode.json");
+            File.Delete(MelonEnvironment.ModsDirectory + "/BloonsTD6 Mod Helper/matchCode.json");
+            waitingForMenuOpen = true;
+        }
     }
 
     private void Schedule_GameModel_Loaded()
@@ -190,13 +191,18 @@ internal partial class MelonMain : BloonsTD6Mod
             EpicCompatibility.PromptDownloadPlugin();
         }
     }
-
+    
     private static NKMultiGameInterface _nkGi;
-        private static ModHelperPanel syncPanel;
-        private static ModHelperPanel playerSyncButton;
-        private static bool waitingForMenuOpen;
-        private static string gameCode;
+    private static ModHelperPanel syncPanel;
+    private static ModHelperPanel playerSyncButton;
+    private static ModHelperPanel progressPanel;
+    private static bool waitingForMenuOpen;
+    private static string gameCode;
+    private static int modsChanged;
 
+    internal partial class CoopSync : BloonsTD6Mod
+    {
+        
         public class PlayerModData
         {
             public int PlayerNumber { get; set; }
@@ -217,7 +223,7 @@ internal partial class MelonMain : BloonsTD6Mod
             private static void Postfix(CoopLobbyScreen __instance)
             {
                 _nkGi = __instance.coopLobbyData.lobbyConnection.Connection.NKGI;
-                
+
                 waitingForMenuOpen = false;
 
                 if (_nkGi.IsCoOpHost())
@@ -312,7 +318,8 @@ internal partial class MelonMain : BloonsTD6Mod
             var modsToRemove = playerMods.Except(hostMods).ToList();
             if (modsToRemove.Count != 0 || modsToAdd.Count != 0)
             {
-                playerSyncButton = GameObject.Find("Canvas/CoopLobbyScreen/CoopPlayerInfo").transform.GetChild(playerNumber - 1).gameObject.AddModHelperPanel(new Info("SyncMods", -206.85f, -50f, 100)
+                playerSyncButton = GameObject.Find("Canvas/CoopLobbyScreen/CoopPlayerInfo").transform
+                    .GetChild(playerNumber - 1).gameObject.AddModHelperPanel(new Info("SyncMods", -206.85f, -50f, 100)
                     {
                         Pivot = Vector2.one,
                         Anchor = Vector2.one
@@ -337,12 +344,37 @@ internal partial class MelonMain : BloonsTD6Mod
 
         public void RestartGame(string matchCode)
         {
+            GameObject.Find("Canvas/CoopLobbyScreen/progressPanel/Text").GetComponent<NK_TextMeshProUGUI>().text = "Done Downloading/Disabling mods, restarting.";
             File.WriteAllText(MelonEnvironment.ModsDirectory + "/BloonsTD6 Mod Helper/matchCode.json", matchCode);
             ProcessHelper.RestartGame();
         }
 
+        public void UpdatePopup()
+        {
+            modsChanged++;
+            string text = GameObject.Find("Canvas/CoopLobbyScreen/progressPanel/Text").GetComponent<NK_TextMeshProUGUI>().text.Replace((modsChanged - 1).ToString(), modsChanged.ToString(), StringComparison.CurrentCultureIgnoreCase);
+            GameObject.Find("Canvas/CoopLobbyScreen/progressPanel/Text").GetComponent<NK_TextMeshProUGUI>().text = text;
+        }
+
+        public static void CreateModPopup(List<string> modsToAdd, List<string> modsToRemove)
+        {
+            string text = "Downloading/Disabling mod " + modsChanged + " out of " + (modsToAdd.Count + modsToRemove.Count) + ".";
+            progressPanel = GameObject.Find("Canvas/CoopLobbyScreen").gameObject.AddModHelperPanel(new Info("progressPanel", -2300, -1200, 500)
+            {
+                Pivot = Vector2.one,
+                Anchor = Vector2.one
+            });
+            var animator = progressPanel.AddComponent<Animator>();
+            animator.runtimeAnimatorController = Animations.PopupAnim;
+            animator.speed *= .7f;
+            progressPanel.AddImage(new Info("backgroundImage", 0, 0, 500), VanillaSprites.BlueBtnLong);
+            progressPanel.AddText(new Info("Text", 0, 0, 5000, 100), text, 75);
+            GameObject.Find("Canvas/CoopLobbyScreen/progressPanel/backgroundImage").transform.localScale = new Vector3(5, 2, 1);
+        }
+
         public async void AddAndRemoveMods(List<string> modsToAdd, List<string> modsToRemove)
         {
+            CreateModPopup(modsToAdd, modsToRemove);
             foreach (var mod in RegisteredMelons.ToList())
             {
                 foreach (var modToRemove in modsToRemove)
@@ -350,6 +382,7 @@ internal partial class MelonMain : BloonsTD6Mod
                     if (mod.Info.Name == modToRemove)
                     {
                         File.Move(mod.MelonAssembly.Assembly.Location, ModHelper.DisabledModsDirectory + "/" + mod.MelonAssembly.Assembly.Location.Substring(MelonEnvironment.ModsDirectory.Length + 1));
+                        UpdatePopup();
                     }
                 }
             }
@@ -360,6 +393,7 @@ internal partial class MelonMain : BloonsTD6Mod
                     if (mod.Name == modToAdd)
                     {
                         await ModHelperGithub.DownloadLatest(mod, true);
+                        UpdatePopup();
                     }
                 }
             }
@@ -492,4 +526,5 @@ internal partial class MelonMain : BloonsTD6Mod
                     return false;
             }
         }
+    }
 }
